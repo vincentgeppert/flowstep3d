@@ -134,62 +134,26 @@ class ProcessData(object):
         self.allow_less_points = allow_less_points
 
     def __call__(self, data):
-        pc1, pc2 = data
+        #pc1, pc2 = data
+        pc1, pc2, sf_dummy = data
+
         if pc1 is None:
             return None, None, None,
-
-        if self.pc2_args is not None:
-            pc2 = do_pc2_aug(self.pc2_args, pc2)
-
-        sf = pc2[:, :3] - pc1[:, :3]
-
-        if self.DEPTH_THRESHOLD > 0:
-            near_mask = np.logical_and(pc1[:, 2] < self.DEPTH_THRESHOLD, pc2[:, 2] < self.DEPTH_THRESHOLD)
-        else:
-            near_mask = np.ones(pc1.shape[0], dtype=np.bool)
+        
+        near_mask = np.ones(pc1.shape[0], dtype=np.bool)
         indices = np.where(near_mask)[0]
         if len(indices) == 0:
             print('indices = np.where(mask)[0], len(indices) == 0')
             return None, None, None
-        sampled_indices1 = None
-        sampled_indices2 = None
-
-        if self.num_points > 0:
-            try:
-                sampled_indices1 = np.random.choice(indices, size=self.num_points, replace=False, p=None)
-                if self.no_corr:
-                    sampled_indices2 = np.random.choice(indices, size=self.num_points, replace=False, p=None)
-                else:
-                    sampled_indices2 = sampled_indices1
-            except ValueError:
-                '''
-                if not self.allow_less_points:
-                    print('Cannot sample {} points'.format(self.num_points))
-                    return None, None, None
-                else:
-                    sampled_indices1 = indices
-                    sampled_indices2 = indices
-                '''
-                if not self.allow_less_points:
-                    #replicate some points
-                    sampled_indices1 = np.random.choice(indices, size=self.num_points, replace=True, p=None)
-                    if self.no_corr:
-                        sampled_indices2 = np.random.choice(indices, size=self.num_points, replace=True, p=None)
-                    else:
-                        sampled_indices2 = sampled_indices1
-                else:
-                    sampled_indices1 = indices
-                    sampled_indices2 = indices
-        else:
-            sampled_indices1 = indices
-            sampled_indices2 = indices
+        
+        sampled_indices1 = indices
+        sampled_indices2 = indices
 
         pc1 = pc1[sampled_indices1]
-        sf = sf[sampled_indices1]
+        sf_dummy = sf_dummy[sampled_indices1]
         pc2 = pc2[sampled_indices2]
-        if self.pc2_args is not None:
-            pc2 = do_pc_jitter(pc2, self.pc2_args['jitter_sigma'], self.pc2_args['jitter_clip'])
-        return pc1, pc2, sf
+        
+        return pc1, pc2, sf_dummy
 
     def __repr__(self):
         format_string = self.__class__.__name__ + '\n(data_process_args: \n'

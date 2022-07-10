@@ -9,21 +9,23 @@ model_params:
 
 exp_params:
   disable_plots: True
-  batch_size: 8
+  batch_size: 1
   num_workers: 32
   test_iters: 5
   data:
     overfit_samples: null
     train_dataset: null
     train_data_root: null
-    test_dataset: kitti
-    test_data_root: data/datasets
-    num_points: 8192
+    test_dataset: kitti_odometry_raw
+    test_data_root: /data/dataset/sequences
+    save_path: /data/inference
+    sequence: 5
+    num_points: 0
     full: False
     allow_less_points: False
 
     data_process:
-      DEPTH_THRESHOLD: 35.
+      DEPTH_THRESHOLD: 0
       NO_CORR: True
       IND_DIR: null
 

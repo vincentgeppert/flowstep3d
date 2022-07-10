@@ -8,6 +8,8 @@ from utils.metrics import SceneFlowMetrics
 from utils.utils import get_num_workers
 from utils.exp_utils import get_datasets
 from losses import *
+import numpy as np
+import os
 
 
 class SceneFlowExp(pl.LightningModule):
@@ -66,13 +68,29 @@ class SceneFlowExp(pl.LightningModule):
     def _test_val_step(self, batch, batch_idx, split):
         pos1, pos2, feat1, feat2, flow_gt, fnames = batch
         flows_pred = self(pos1, pos2, feat1, feat2, self.hparams[f'{split}_iters'])
-        loss = self.sequence_loss(pos1, pos2, flows_pred, flow_gt)
-        metrics = self.val_metrics(pos1, pos2, flows_pred, flow_gt)
+
+        #save flow prediciton to file
+        flow_pred_iter_5 = flows_pred[4]
+        flow_pred_iter_5 = flow_pred_iter_5.cpu().numpy()
+        flow_pred_iter_5 = np.asarray(flow_pred_iter_5, dtype=np.float32)
+
+        sf_file_name = fnames[0].split('/')[-1].split('.')[0] + '_flow' + '.bin'
+
+        save_path =  self.hparams['data']['save_path']
+        seq = self.hparams['data']['sequence']
+        seq = '{0:02d}'.format(int(seq))
+
+        path_to_save = os.path.join(save_path,'scene_flow', seq, 'predictions', sf_file_name) #KITTI_odometry
+        flow_pred_iter_5.tofile(path_to_save)
+
+        #loss = self.sequence_loss(pos1, pos2, flows_pred, flow_gt)
+        ##metrics = self.val_metrics(pos1, pos2, flows_pred, flow_gt)
         
-        i_last = self.hparams[f'{split}_iters'] - 1
-        val_results = pl.EvalResult(checkpoint_on=metrics[f'val_epe3d_i#{i_last}'])
-        val_results.log('val_loss', loss, sync_dist=True, on_step=False, on_epoch=True, logger=True, prog_bar=False, reduce_fx=torch.mean)
-        val_results.log_dict(metrics, on_step=False, on_epoch=True, logger=True, prog_bar=False, reduce_fx=torch.mean)  # No need to sync_dist since metrics are already synced
+        ##i_last = self.hparams[f'{split}_iters'] - 1
+        val_results = pl.EvalResult()
+        #val_results = pl.EvalResult(checkpoint_on=metrics[f'val_epe3d_i#{i_last}'])
+        #val_results.log('val_loss', loss, sync_dist=True, on_step=False, on_epoch=True, logger=True, prog_bar=False, reduce_fx=torch.mean)
+        ##val_results.log_dict(metrics, on_step=False, on_epoch=True, logger=True, prog_bar=False, reduce_fx=torch.mean)  # No need to sync_dist since metrics are already synced
 
         return val_results
 

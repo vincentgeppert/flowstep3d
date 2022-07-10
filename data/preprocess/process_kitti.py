@@ -6,13 +6,14 @@ from multiprocessing import Pool
 from kitti_utils import *
 
 calib_root = './utils/calib_cam_to_cam/'
-data_root = sys.argv[1]
+#data_root = sys.argv[1]
+data_root = '/disk/vanishing_data/kb422/scene_flow'
 disp1_root = osp.join(data_root, 'training/disp_occ_0')
 disp2_root = osp.join(data_root, 'training/disp_occ_1')
 op_flow_root = osp.join(data_root, 'training/flow_occ')
 
-save_path = sys.argv[2]
-
+#save_path = sys.argv[2]
+save_path = '/disk/vanishing_data/kb422/scene_flow/postprocessed'
 
 def process_one_frame(idx):
     sidx = '{:06d}'.format(idx)

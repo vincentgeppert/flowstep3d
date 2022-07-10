@@ -1,4 +1,5 @@
 from data.loaders.kitti import KITTI
+from data.loaders.kitti_odometry_raw import KITTI_odometry_raw
 from data.loaders.flyingthings3d_subset import FlyingThings3DSubset
 from data.transforms import transforms
 
@@ -42,11 +43,23 @@ def get_datasets(data_params):
         val_dataset = None
 
     if data_params['test_dataset'] is not None:
+        '''
         if data_params['test_dataset'] == 'kitti':
             test_dataset = KITTI(train=False,
-                                 transform=test_transform,
-                                 num_points=data_params['num_points'],
-                                 data_root=data_params['test_data_root'])
+                                transform=test_transform,
+                                num_points=data_params['num_points'],
+                                data_root=data_params['test_data_root'])
+        
+        '''
+    
+        if data_params['test_dataset'] == 'kitti_odometry_raw':
+            test_dataset = KITTI_odometry_raw(train=False,
+                                        transform=test_transform,
+                                        num_points=data_params['num_points'],
+                                        data_root=data_params['test_data_root'],
+                                        save_path=data_params['save_path'],
+                                        sequence=data_params['sequence'])
+
         elif data_params['test_dataset'] == 'flyingthings3d':
             test_dataset = FlyingThings3DSubset(False,
                                                 transform=test_transform,

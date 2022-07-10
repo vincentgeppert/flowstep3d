@@ -77,9 +77,9 @@ class SceneFlowMetrics():
             reduce_op: the operation to perform during reduction within DDP (only needed for DDP training).
                         Defaults to sum.
         """
-
+        
         self.metrics = {
-            split + '_epe3d': EPE3D(name='epe3d', reduce_op=reduce_op),
+        #    split + '_epe3d': EPE3D(name='epe3d', reduce_op=reduce_op),
 
         }
         if loss_params['loss_type'] == 'sv_l1_reg':
@@ -89,11 +89,13 @@ class SceneFlowMetrics():
             self.metrics[f'{split}_chamfer_loss'] = ChamferLossMetric(loss_params['chamfer_loss_params'], name=f'{split}_chamfer_loss', reduce_op=reduce_op)
             self.metrics[f'{split}_smoothness_loss'] = SmoothnessLossMetric(loss_params['smoothness_loss_params'], name=f'{split}_smoothness_loss', reduce_op=reduce_op)
 
-        if split in ['test', 'val']:
-            self.metrics[f'{split}_acc3dr'] = Acc3DR(name='acc3dr', reduce_op=reduce_op)
-            self.metrics[f'{split}_acc3ds'] = Acc3DS(name='acc3ds', reduce_op=reduce_op)
-            self.metrics[f'{split}_epe3d_outliers'] = EPE3DOutliers(name='epe3d_outliers', reduce_op=reduce_op)
-
+        
+        #not for self-supervised, no gt available
+        #if split in ['test', 'val']:
+        #    self.metrics[f'{split}_acc3dr'] = Acc3DR(name='acc3dr', reduce_op=reduce_op)
+        #    self.metrics[f'{split}_acc3ds'] = Acc3DS(name='acc3ds', reduce_op=reduce_op)
+        #    self.metrics[f'{split}_epe3d_outliers'] = EPE3DOutliers(name='epe3d_outliers', reduce_op=reduce_op)
+        
     def __call__(self, pc_source: torch.Tensor, pc_target: torch.Tensor, pred_flows: list, gt_flow: torch.Tensor) -> dict:
         """
         Compute and scale the resulting metrics

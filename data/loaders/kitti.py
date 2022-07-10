@@ -22,7 +22,7 @@ class KITTI(data.Dataset):
                  num_points,
                  data_root,
                  remove_ground=True):
-        self.root = osp.join(data_root, 'KITTI_processed_occ_final')
+        self.root = osp.join(data_root)
         #assert train is False
         self.train = train
         self.transform = transform
@@ -60,7 +60,7 @@ class KITTI(data.Dataset):
         return fmt_str
 
     def make_dataset(self):
-        do_mapping = True
+        do_mapping = False
         root = osp.realpath(osp.expanduser(self.root))
 
         all_paths = sorted(os.walk(root))
@@ -93,6 +93,9 @@ class KITTI(data.Dataset):
         """
         pc1 = np.load(osp.join(path, 'pc1.npy'))  #.astype(np.float32)
         pc2 = np.load(osp.join(path, 'pc2.npy'))  #.astype(np.float32)
+
+        print('{}{}'.format('number of points pc1: ', pc1.shape))
+        print('{}{}'.format('number of points pc2: ', pc2.shape))
 
         if self.remove_ground:
             is_ground = np.logical_and(pc1[:,1] < -1.4, pc2[:,1] < -1.4)

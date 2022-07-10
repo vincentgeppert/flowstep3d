@@ -56,6 +56,7 @@ def main(config):
         trainer.test(experiment)
 
 
+#def start_flowstep3d(config_path):
 if __name__ == '__main__':
     
     # Load config file from input arguments
@@ -67,6 +68,7 @@ if __name__ == '__main__':
                         default='configs/test/flowstep3d_self.yaml')
                     
     args = parser.parse_args()
+    
     with open(args.filename, 'r') as f:
         try:
             config = yaml.safe_load(f)
