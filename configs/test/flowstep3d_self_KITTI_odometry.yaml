@@ -25,7 +25,7 @@ exp_params:
     full: false
     num_points: 0
     overfit_samples: null
-    save_path: /disk/vanishing_data/ju878/inference
+    save_path: /disk/vanishing_data/ju878/log_finn
     sequence:
     - 1
     - 2
